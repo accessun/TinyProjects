@@ -84,11 +84,11 @@ public class ValidateExpression {
 		return true;
 	}
 
-    private boolean isOperator(String op) {
-        if (op.equals("+") || op.equals("-") || op.equals("*") || op.equals("/"))
-            return true;
-        return false;
-    }
+	private boolean isOperator(String op) {
+		if (op.equals("+") || op.equals("-") || op.equals("*") || op.equals("/"))
+			return true;
+		return false;
+	}
     
 	public static void main(String[] args) {
 		ArrayList<String> expressionList = new ArrayList<String>();
