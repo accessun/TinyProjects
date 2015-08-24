@@ -1,10 +1,11 @@
 /***********************************************************************
- *  Compilation: javac FunctionalCalculator.java
- *  Execution:   java FunctionalCalculator < filename
- *  Test files:  data-fc-1.txt
- *               data-fc-2.txt
- *               data-fc-3.txt
- *               data-fc-4.txt
+ *  Compilation:  javac FunctionalCalculator.java
+ *  Execution:    java FunctionalCalculator < filename
+ *  Dependencies: ValidateExpression.class
+ *  Test files:   data-fc-1.txt
+ *                data-fc-2.txt
+ *                data-fc-3.txt
+ *                data-fc-4.txt
  *
  *  Calculates the result of a functional math expression (Four basic
  *  operations are supported: addition, subtraction, mutiplication, and
@@ -29,8 +30,10 @@
  *
  **********************************************************************/
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.NoSuchElementException;
 
 /**
  *  The <tt>FunctionalCalculator</tt> class provides a static method
@@ -42,56 +45,80 @@ import java.util.Stack;
  *  @author Xin Sun
  */
 public class FunctionalCalculator {
-    public static double calc() {
-        Scanner scannerObject = new Scanner(System.in);
-        Stack<String> readInStack = new Stack<String>();
-        Stack<Double> tempOperandsStack = new Stack<Double>();
 
-        while (scannerObject.hasNext()) {
-             String readIn = scannerObject.next();
-             if (readIn.equals("(")) { /* do nothing */ }
-             else if (readIn.equals(")")) {
-                 // do the calculation in this block of code
-                 String s = readInStack.pop();
-                 while (!isOperator(s)) {
-                     tempOperandsStack.push(Double.parseDouble(s));
-                     s = readInStack.pop();
-                 }
+    private ArrayList<String> expressionList = new ArrayList<String>();
+    private Stack<String> readInStack = new Stack<String>();
+    private Stack<Double> tempOperandsStack = new Stack<Double>();
 
-                 double val = tempOperandsStack.pop();
-                 if (s.equals("+")) {
-                     while (!tempOperandsStack.empty())
-                         val += tempOperandsStack.pop();
-                 }
-                 else if (s.equals("-")) {
-                     while (!tempOperandsStack.empty())
-                         val -= tempOperandsStack.pop();
-                 }
-                 else if (s.equals("*")) {
-                     while (!tempOperandsStack.empty())
-                         val *= tempOperandsStack.pop();
-                 }
-                 else { // divide "/"
-                     while (!tempOperandsStack.empty())
-                         val /= tempOperandsStack.pop();
-                 }
-                 readInStack.push("" + val);
-             }
-             else {
-                 readInStack.push(readIn);
-             }
-        }
-
-        return Double.parseDouble(readInStack.pop());
+    public static void main(String[] args) {
+        new FunctionalCalculator().calc();
     }
 
-    private static boolean isOperator(String op) {
+    public void calc() {
+
+        readInExpression();
+        if (expressionList.isEmpty())
+            throw new NoSuchElementException("Expression must not be empty!");
+
+        // validate the format of the expression stored in the ArrayList
+        // before performing the calculation procedure
+        if (!(new ValidateExpression().validate(expressionList)))
+            throw new UnsupportedOperationException("Expression is misformed. Check again.");
+
+        for (String readIn : expressionList) {
+
+             if (readIn.equals("(")) { /* do nothing */ }
+             else if (readIn.equals(")")) {
+                // do the calculation in this block of code
+                // the core calculation block relies on the assumption that the
+                // input items must be "(", ")", operators, and double values
+                // (they are separated by spaces. No other kind of input is 
+                // permitted.)
+                String s = readInStack.pop();
+                while (!isOperator(s)) {
+                    // If it is not an operator, it must be a double value.
+                    tempOperandsStack.push(Double.parseDouble(s));
+                    s = readInStack.pop();
+                }
+
+                double val = tempOperandsStack.pop();
+                if (s.equals("+")) {
+                    while (!tempOperandsStack.empty())
+                        val += tempOperandsStack.pop();
+                }
+                else if (s.equals("-")) {
+                    while (!tempOperandsStack.empty())
+                        val -= tempOperandsStack.pop();
+                }
+                else if (s.equals("*")) {
+                    while (!tempOperandsStack.empty())
+                        val *= tempOperandsStack.pop();
+                }
+                else { // divide "/"
+                    while (!tempOperandsStack.empty())
+                        val /= tempOperandsStack.pop();
+                }
+                readInStack.push("" + val);
+            }
+            else {
+                readInStack.push(readIn);
+            }
+        }
+
+        Double result =  Double.parseDouble(readInStack.pop());
+        System.out.println("Result: " + result);
+    }
+
+    private boolean isOperator(String op) {
         if (op.equals("+") || op.equals("-") || op.equals("*") || op.equals("/"))
             return true;
         return false;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Result: " + calc());
+    private void readInExpression() {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext())
+            expressionList.add(sc.next());
+        sc.close();
     }
 }
