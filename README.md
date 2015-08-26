@@ -1,2 +1,4 @@
-# FunctionalCalculator
-A simple Java program used to calculate functional style math expression
+# TinyProjects
+
+This directory contains some interesting tiny projects I wrote in Java.
+
