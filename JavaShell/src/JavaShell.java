@@ -23,6 +23,8 @@
  ***********************************************************************/
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Scanner;
 
 /**
@@ -91,6 +93,19 @@ public class JavaShell {
 		if (baseCommand.equals("pwd")) {
 			System.out.println(currentWorkingDir);
 			return;
+		}
+		
+		// cat command
+		if (baseCommand.equals("cat")) {
+			try {
+				String filename = commandList[1];
+				BufferedReader reader = new BufferedReader(new FileReader(filename));
+				String lineOfText = null;
+				while ((lineOfText = reader.readLine()) != null)
+					System.out.println(lineOfText);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }
